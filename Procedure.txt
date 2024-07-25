@@ -1,0 +1,24 @@
+Procedure:
+1) Setting Up Meta data, like: 
+2) Csv to Data
+3) Create the conditions to check for Admissibility!
+4) Create Admissibility Graph, Networkx.
+5) Calculate pricing/rates for each node, which will be called in optimization.py
+7) Calculate avg_dist btwn srcs for occupancy index
+Note: Occupancy index is the avg distance of the node from rest of the nodes.
+8) Occupancy index is added as weights to the vertices of the graph.
+9) Metadata for Vehicles and a list to incorporate them.
+10) Call Standard coloring or Weighted vertex coloring! This gives us the color classes.
+Note: As we have gone through the cumbersome task of calculating the weights, we shall be using WVC! Pun intended!
+11) Operations on the color classes to get the revenue and other results.
+12) SUMO to simulate the results of the WVC.
+
+The procedure is followed for the first 3 layers, The last layer of delivery personnel will be solved by Clustering!
+
+Meta-Data:
+1) Requests Object: 
+Will have conditions which will be used to check admissibility like complementary goods, priority index; for consumables with low shelf life, or higher alertness etc.
+
+2) Vehicle Objects:
+
+Return Orders:
