@@ -40,11 +40,11 @@ def visualize_packing(bin):
     ]], alpha=0.2)
     floor.set_facecolor('gray')
     ax.add_collection3d(floor)
-
+# 40% paper - 20% mid 20% quiz 
     colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FED766', '#2AB7CA', '#F0B67F']
     item_polygons = {}
     for item in bin.items:
-        base_color = colors[item.id % len(colors)]
+        base_color = colors[int(item.id) % len(colors)]
         edge_color = mcolors.to_rgba(base_color, 0.8)
         face_color = mcolors.to_rgba(base_color, 0.6)
         poly = plot_cuboid(ax, *item.position, item.length, item.width, item.height, edge_color=edge_color, face_color=face_color, alpha=0.8)

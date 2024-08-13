@@ -1,6 +1,27 @@
+def create_items(item_id, length, width, height, weight, stackable, fragile, supplier_id, warehouse_id, quantity):
+    items = []
+    for i in range(quantity):
+        new_item = Item(
+            id=item_id,  # Use the same item_id for all items in this batch
+            quantity_id=i+1,  # Unique quantity_id for each item in the batch
+            length=length,
+            width=width,
+            height=height,
+            weight=weight,
+            stackable=stackable,
+            fragile=fragile,
+            supplier_id=supplier_id,
+            warehouse_id=warehouse_id,
+            quantity=1  # Each individual item has quantity 1
+        )
+        items.append(new_item)
+    return items
+
+# Modify the Item class to include a quantity_id attribute
 class Item:
-    def __init__(self, id, length, width, height, weight, stackable, fragile, supplier_id=None, warehouse_id=None, quantity=1, position=None):
+    def __init__(self, id, quantity_id, length, width, height, weight, stackable, fragile, supplier_id=None, warehouse_id=None, quantity=1, position=None):
         self.id = id
+        self.quantity_id = quantity_id  # Unique quantity identifier for items with the same ID
         self.length = length
         self.width = width
         self.height = height
@@ -12,6 +33,9 @@ class Item:
         self.quantity = quantity
         self.position = position if position is not None else (0, 0, 0)
 
+    def __str__(self):
+        return f"Item {self.id}-{self.quantity_id}"
+    
 class Bin:
     def __init__(self, length, width, height):
         self.length = length
