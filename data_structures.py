@@ -1,4 +1,4 @@
-def create_items(item_id, length, width, height, weight, stackable, fragile, supplier_id, warehouse_id, quantity):
+def create_items(item_id, length, width, height, weight, stackable, fragile, quantity):
     items = []
     for i in range(quantity):
         new_item = Item(
@@ -10,8 +10,6 @@ def create_items(item_id, length, width, height, weight, stackable, fragile, sup
             weight=weight,
             stackable=stackable,
             fragile=fragile,
-            supplier_id=supplier_id,
-            warehouse_id=warehouse_id,
             quantity=1  # Each individual item has quantity 1
         )
         items.append(new_item)
@@ -19,7 +17,7 @@ def create_items(item_id, length, width, height, weight, stackable, fragile, sup
 
 # Modify the Item class to include a quantity_id attribute
 class Item:
-    def __init__(self, id, quantity_id, length, width, height, weight, stackable, fragile, supplier_id=None, warehouse_id=None, quantity=1, position=None):
+    def __init__(self, id, quantity_id, length, width, height, weight, stackable, fragile, supplier_id=None, quantity=1, position=None):
         self.id = id
         self.quantity_id = quantity_id  # Unique quantity identifier for items with the same ID
         self.length = length
@@ -28,12 +26,12 @@ class Item:
         self.weight = weight
         self.stackable = stackable
         self.fragile = fragile
-        self.supplier_id = supplier_id  # Optional: placeholder for supplier ID
-        self.warehouse_id = warehouse_id  # Optional: placeholder for warehouse ID
+        self.supplier_id = 0  # Optional: placeholder for supplier ID
+        self.warehouse_id = 0  # Optional: placeholder for warehouse ID
         self.quantity = quantity
         self.position = position if position is not None else (0, 0, 0)
 
-    def __str__(self):
+    def _str_(self):
         return f"Item {self.id}-{self.quantity_id}"
     
 class Bin:

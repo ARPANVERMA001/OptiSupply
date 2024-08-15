@@ -49,17 +49,16 @@ def optimize_packing(bin, items):
                               for dz in range(max(0, pz - item.height + 1), min(pz + 1, bin.height - item.height + 1))
                               if dx + item.length > px and dy + item.width > py and dz + item.height > pz) <= 1
 
-    # Stackable items constraint: Ensure stackable items can only be placed on other items
+    # Support constraint for all items: Ensure no item is floating in the air
     for uid, item in unique_items:
-        if item.stackable:
-            for dx in range(bin.length - item.length + 1):
-                for dy in range(bin.width - item.width + 1):
-                    for dz in range(1, bin.height - item.height + 1):  # Start from height 1 to allow stacking
-                        prob += x[(uid, dx, dy, dz)] <= lpSum(x[(j_uid, dx1, dy1, dz - item.height)] 
-                                                               for j_uid, j_item in unique_items if j_uid != uid
-                                                               for dx1 in range(dx, min(dx + item.length, bin.length - j_item.length + 1))
-                                                               for dy1 in range(dy, min(dy + item.width, bin.width - j_item.width + 1))
-                                                               if (j_uid, dx1, dy1, dz - item.height) in x)
+        for dx in range(bin.length - item.length + 1):
+            for dy in range(bin.width - item.width + 1):
+                for dz in range(1, bin.height - item.height + 1):  # Start from height 1 to ensure items are supported
+                    prob += x[(uid, dx, dy, dz)] <= lpSum(x[(j_uid, dx1, dy1, dz - item.height)] 
+                                                           for j_uid, j_item in unique_items if j_uid != uid
+                                                           for dx1 in range(dx, min(dx + item.length, bin.length - j_item.length + 1))
+                                                           for dy1 in range(dy, min(dy + item.width, bin.width - j_item.width + 1))
+                                                           if (j_uid, dx1, dy1, dz - item.height) in x)
 
     # Fragile items must be placed on the floor or fully supported
     for uid, item in unique_items:
