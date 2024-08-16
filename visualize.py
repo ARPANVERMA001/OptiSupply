@@ -5,6 +5,27 @@ from mpl_toolkits.mplot3d import proj3d
 import matplotlib.colors as mcolors
 
 def plot_cuboid(ax, x, y, z, dx, dy, dz, edge_color='black', face_color='gray', alpha=0.5):
+    """
+    Plots a 3D cuboid on the given axis.
+
+    Parameters:
+    ax : matplotlib.axes._subplots.Axes3DSubplot
+        The 3D axis to plot on.
+    x, y, z : float
+        The starting coordinates of the cuboid.
+    dx, dy, dz : float
+        The dimensions of the cuboid along the x, y, and z axes.
+    edge_color : str, optional
+        The color of the cuboid edges. Default is 'black'.
+    face_color : str, optional
+        The color of the cuboid faces. Default is 'gray'.
+    alpha : float, optional
+        The transparency of the cuboid faces. Default is 0.5.
+
+    Returns:
+    poly : matplotlib.art3d.Poly3DCollection
+        The polygon collection representing the cuboid.
+    """
     xx = [x, x, x+dx, x+dx, x]
     yy = [y, y+dy, y+dy, y, y]
     zz = [z, z, z, z, z]
@@ -25,6 +46,13 @@ def plot_cuboid(ax, x, y, z, dx, dy, dz, edge_color='black', face_color='gray', 
     return poly
 
 def visualize_packing(bin):
+    """
+    Visualizes the packing of items in a 3D bin or truck using matplotlib.
+
+    Parameters:
+    bin : Bin
+        The bin or truck to visualize, containing items to be packed.
+    """
     fig = plt.figure(figsize=(15, 10))
     ax = fig.add_subplot(111, projection='3d')
 
@@ -75,6 +103,13 @@ def visualize_packing(bin):
     ax.set_zlabel('Height')
     
     def on_click(event):
+        """
+        Handles click events on the plot to display information about the clicked item.
+
+        Parameters:
+        event : matplotlib.backend_bases.MouseEvent
+            The mouse event triggered by clicking on the plot.
+        """
         if event.inaxes != ax:
             return
         

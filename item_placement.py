@@ -1,7 +1,46 @@
 from pulp import LpProblem, LpMaximize, LpVariable, lpSum, GUROBI_CMD, value
 
 def optimize_packing(bin, items):
-    print("INSIDE OPTIMIZE_PACKING")
+    """
+        Solves a 3D bin packing problem using linear programming to optimize the placement of items within a bin.
+        The objective is to maximize space utilization while respecting constraints such as item dimensions, 
+        support for fragile items, and no overlap between items.
+
+        Parameters:
+        -----------
+        bin : Bin
+            The bin object representing the container into which items will be packed. It has attributes like 
+            length, width, height, and a list to store the items placed in it.
+        items : list of Item
+            A list of item objects that need to be packed into the bin. Each item has attributes like id, 
+            quantity_id, length, width, height, and a boolean flag indicating whether it is fragile.
+
+        Returns:
+        --------
+        int
+            The status of the optimization problem after solving, which can indicate whether an optimal solution 
+            was found, whether the problem was infeasible, or other status codes as defined by the solver.
+
+        Notes:
+        ------
+        - The function generates unique IDs for each item by combining the item's `id` and `quantity_id` to 
+        ensure that each instance of an item is uniquely identified.
+        - The decision variables `x` represent whether a specific item is placed at a particular position (dx, dy, dz)
+        within the bin.
+        - The objective function aims to maximize the utilization of the bin's space by considering item placement 
+        while also slightly favoring positions that utilize the bin's dimensions more effectively.
+        - Constraints ensure that:
+            1. Each item is placed in at most one position within the bin.
+            2. Items do not overlap with each other.
+            3. Items are properly supported, meaning no item is floating without support from below.
+            4. Fragile items are either placed on the floor or fully supported by other items and cannot have 
+            any other items placed on top of them.
+        - The function uses the GUROBI solver, and a time limit can be set to improve performance by terminating 
+        the solver early if needed.
+        - After solving, the function assigns positions to items in the bin and ensures no two items occupy the 
+        same position.
+    """
+    # print("INSIDE OPTIMIZE_PACKING")
 
     # Create a hash map to store the mapping of unique IDs to items
     item_hash_map = {}
@@ -49,17 +88,16 @@ def optimize_packing(bin, items):
                               for dz in range(max(0, pz - item.height + 1), min(pz + 1, bin.height - item.height + 1))
                               if dx + item.length > px and dy + item.width > py and dz + item.height > pz) <= 1
 
-    # Stackable items constraint: Ensure stackable items can only be placed on other items
+    # Support constraint for all items: Ensure no item is floating in the air
     for uid, item in unique_items:
-        if item.stackable:
-            for dx in range(bin.length - item.length + 1):
-                for dy in range(bin.width - item.width + 1):
-                    for dz in range(1, bin.height - item.height + 1):  # Start from height 1 to allow stacking
-                        prob += x[(uid, dx, dy, dz)] <= lpSum(x[(j_uid, dx1, dy1, dz - item.height)] 
-                                                               for j_uid, j_item in unique_items if j_uid != uid
-                                                               for dx1 in range(dx, min(dx + item.length, bin.length - j_item.length + 1))
-                                                               for dy1 in range(dy, min(dy + item.width, bin.width - j_item.width + 1))
-                                                               if (j_uid, dx1, dy1, dz - item.height) in x)
+        for dx in range(bin.length - item.length + 1):
+            for dy in range(bin.width - item.width + 1):
+                for dz in range(1, bin.height - item.height + 1):  # Start from height 1 to ensure items are supported
+                    prob += x[(uid, dx, dy, dz)] <= lpSum(x[(j_uid, dx1, dy1, dz - item.height)] 
+                                                           for j_uid, j_item in unique_items if j_uid != uid
+                                                           for dx1 in range(dx, min(dx + item.length, bin.length - j_item.length + 1))
+                                                           for dy1 in range(dy, min(dy + item.width, bin.width - j_item.width + 1))
+                                                           if (j_uid, dx1, dy1, dz - item.height) in x)
 
     # Fragile items must be placed on the floor or fully supported
     for uid, item in unique_items:
@@ -92,17 +130,17 @@ def optimize_packing(bin, items):
     # Extract and assign positions
     assigned_positions = set()  # Keep track of assigned positions to ensure no duplicates
     for uid, item in unique_items:
-        print(f"Checking placement for item {uid}")
+        # print(f"Checking placement for item {uid}")
         placed = False
         for dx in range(bin.length - item.length + 1):
             for dy in range(bin.width - item.width + 1):
                 for dz in range(bin.height - item.height + 1):
                     if value(x[(uid, dx, dy, dz)]) == 1:
-                        print("1...")
-                        print(item.id)
+                        # print("1...")
+                        # print(item.id)
                         if (dx, dy, dz) not in assigned_positions:
-                            print("2...")
-                            print(item.id)
+                            # print("2...")
+                            # print(item.id)
                             item.position = (dx, dy, dz)
                             bin.items.append(item)
                             assigned_positions.add((dx, dy, dz))
